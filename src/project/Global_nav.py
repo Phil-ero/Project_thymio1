@@ -2,10 +2,11 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
+# -----------Map class -----------------------------------------------------------
 
 
 class Map:
-    def __init__(self, width, height, start, end, grid):
+    def __init__(self, width, height, start, end, grid, ratio_total):
         self.width = width
         self.height = height
         self.start = start
@@ -14,6 +15,7 @@ class Map:
         self.path = np.empty(0)
         self.checkpoints = np.empty(0)
         self.visited = np.empty(0)
+        self.ratio_total = ratio_total
         self.path_solved = False
 
     def run_map(self, verbose=False):
@@ -78,7 +80,10 @@ class Map:
         ax.invert_yaxis()
         ax.xaxis.tick_top()
         plt.show()
+# ---------------------------------------------------------------------------------------
 
+
+# -----------_get_movements_8n-------------------------------------------------------------------
 
 def _get_movements_8n():
     """
@@ -95,7 +100,10 @@ def _get_movements_8n():
             (-1, 1, s2),
             (-1, -1, s2),
             (1, -1, s2)]
+# ---------------------------------------------------------------------------------------
 
+
+# -----------reconstruct_path-------------------------------------------------------------------
 
 def reconstruct_path(cameFrom, current):
     """
@@ -112,7 +120,10 @@ def reconstruct_path(cameFrom, current):
         total_path.insert(0, cameFrom[current])
         current = cameFrom[current]
     return total_path
+# ---------------------------------------------------------------------------------------
 
+
+# -----------A_Star-------------------------------------------------------------------
 
 def A_Star(start, goal, h, coords, occupancy_grid, width, height, movement_type="8N"):
     """
@@ -216,11 +227,15 @@ def A_Star(start, goal, h, coords, occupancy_grid, width, height, movement_type=
     # Open set is empty but goal was never reached
     print("No path found to goal")
     return [], closedSet
+# ---------------------------------------------------------------------------------------
 
+
+# -----------checkpoints_path------------------------------------------------------------
 
 def checkpoints_path(path):
     """
     Calculation of the checkpoints
+    :param path: calculated path
     """
     steps = np.size(path, 1)
     checkpoints = np.reshape(path[:, 0], (2, -1))
@@ -233,11 +248,19 @@ def checkpoints_path(path):
                     (path[1, (i + 1)] - path[1, i]) != (path[1, i] - path[1, (i - 1)]))):
                 checkpoints = np.append(checkpoints, nb_i, axis=1)
     return checkpoints
+# ---------------------------------------------------------------------------------------
 
+
+# -----------run_Astar-------------------------------------------------------------------
 
 def run_Astar(occupancy_grid, start, goal, width, height):
     """
     Initialisation and run the A*star algorithm
+    :param occupancy_grid: Matrix containing the obstacles
+    :param start: (X,Y) starting point
+    :param goal: (X,Y) end point
+    :param width: width of the map
+    :param height: height of the map
     """
     # List of all coordinates in the grid
     x, y = np.mgrid[0:width:1, 0:height:1]
@@ -263,11 +286,17 @@ def run_Astar(occupancy_grid, start, goal, width, height):
     else:
         verbose = False
         return verbose, [], [], []
+# ---------------------------------------------------------------------------------------
 
+
+# -----------box_range-------------------------------------------------------------------
 
 def box_range(coord, coord_size, Margin):
     """
     Find the smallest box around the obstacle including the Margin.
+    :param coord: X or Y coordinate of the obstacle
+    :param coord_size: either width or height depending of the coord analyzed
+    :param Margin: Margin taken for the size of the thymio
     """
     coord_low = np.arange((coord - Margin), coord)
     coord_high = np.arange(coord, (coord + Margin + 1))
@@ -275,11 +304,19 @@ def box_range(coord, coord_size, Margin):
     coord_tot = coord_tot[coord_tot >= 0]
     coord_tot = coord_tot[coord_tot < coord_size]
     return coord_tot
+# ---------------------------------------------------------------------------------------
 
+
+# -----------Obstacles_real--------------------------------------------------------------
 
 def Obstacles_real(size_thymio, size_pixel, grid, width, height):
     """
     Augment the size of each obstacle, to palliate the problem of point size robot
+    :param size_thymio: size in pixels of the thymio
+    :param size_pixel: size of a pixel
+    :param grid: Matrix containing the obstacles
+    :param width: width of the map
+    :param height: height of the map
     """
     Margin_px = size_thymio / size_pixel
     temp_grid = grid.copy()

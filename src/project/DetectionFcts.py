@@ -9,7 +9,7 @@ from Global_nav import Map
 
 # -----------FindOuterContour-----------------------------------------------------------
 
-def FindOuterContour(img, areaMin, ShowCanny=False):
+def FindOuterContour(img, areaMin, ShowCanny=False, ShowImg = True):
     """
     Finds the outer most border of the image. Uses Canny filter. finds the one with the
     biggest area and sets it to the outer border
@@ -51,7 +51,8 @@ def FindOuterContour(img, areaMin, ShowCanny=False):
         for points in approx:
             x, y = points[0]
             cv2.circle(img, (x, y), 3, (255, 0, 255), -1)
-    cv2.imshow('original2', img)
+    if (ShowImg):
+        cv2.imshow('original2', img)
     # Plotting the original photo with map borders detected
     # plt.figure(figsize=(7, 7))
     # rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -467,7 +468,7 @@ def downscale_img(width, height, ratio_downscale, start, end, img):
 
 # ---------------------------------------------------------------------------------------
 
-# -----------Analyse-------------------------------------------------------------------
+# -----------Analyse---------------------------------------------------------------------
 def analyse(img):
     """
     Perform a full analyse of an image provided by the camera
@@ -518,10 +519,9 @@ def analyse(img):
             # Augment size of obstacles taking account of robot size
             grid2 = GN.Obstacles_real(size_thymio, size_pixel, occupancy_grid, w_down, h_down)
             # instantiate the map and running it
-            m = Map(w_down, h_down, start_d, end_d, grid2)
+            m = Map(w_down, h_down, start_d, end_d, grid2, ratio_total)
             m.run_map(True)
-
-            if len(m.path != 0):
+            if m.path != []:
                 xMap = m.path[0] / ratio_downscale
                 xMap = xMap.astype(int)
                 yMap = m.path[1] / ratio_downscale
@@ -530,6 +530,35 @@ def analyse(img):
                     x = xMap[i]
                     y = yMap[i]
                     cv2.circle(croppedImg, (x, y), 3, (0, 255, 255), -1)
+            return m, contours, area_max
         # cv2.imshow('path', croppedImg)
     else:
         print("did not find outer contours")
+        return []
+# ---------------------------------------------------------------------------------------
+
+
+# -----------analyse_thymio--------------------------------------------------------------
+def analyse_thymio(img,contours, area_max):
+    """
+    Perform detection of thymio via image provided by the camera
+    :param img: image from the camera
+    :param contours: contours of outer contour
+    :param area_max: threshold for max detection
+    """
+    # Find the outer boundary
+    # contours, area_max = FindOuterContour(img, areaMin=280, ShowCanny=False, ShowImg= False)
+    # if outer boundary found
+    if (contours[0]) > 0:
+        # resize the image with outer contours
+        croppedImg, _, _ = CropImage(img, contours)
+        # cv2.imshow('cropped', croppedImg)
+        Thymio_pos = thymio_detect(croppedImg, area_max)
+        if Thymio_pos != []:
+            Thymio_xy = Thymio_pos[0]
+            Thymio_coord = (Thymio_xy[0], Thymio_xy[1], Thymio_pos[1])
+            return Thymio_coord, True
+        else:
+            return [], False
+    else:
+        return [], False

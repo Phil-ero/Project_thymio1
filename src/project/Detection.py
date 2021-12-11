@@ -76,10 +76,10 @@ while True:
                 # Augment size of obstacles taking account of robot size
                 grid2 = GN.Obstacles_real(size_thymio, size_pixel, occupancy_grid, w_down, h_down)
                 # instantiate the map and running it
-                m = Map(w_down, h_down, start_d, end_d, grid2)
+                m = Map(w_down, h_down, start_d, end_d, grid2,ratio_total)
                 m.run_map(True)
 
-                if len(m.path != 0):
+                if m.path != []:
                     xMap = m.path[0] / ratio_downscale
                     xMap = xMap.astype(int)
                     yMap = m.path[1] / ratio_downscale
