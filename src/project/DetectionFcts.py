@@ -3,8 +3,8 @@ import numpy as np
 import math
 import Global_nav as GN
 from Global_nav import Map
-import matplotlib.pyplot as plt
-from matplotlib import colors
+# import matplotlib.pyplot as plt
+# from matplotlib import colors
 
 
 # -----------FindOuterContour-----------------------------------------------------------
