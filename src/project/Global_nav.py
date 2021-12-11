@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import colors
 
+
 class Map:
     def __init__(self, width, height, start, end, grid):
         self.width = width
@@ -20,11 +21,14 @@ class Map:
         Function to run the A_star algorithm on the Map.
         :param verbose: plot the Map if true
         """
-        start = self.start[:2]
-        self.path, self.checkpoints, self.visited = run_Astar(self.grid, start, self.end, self.width, self.height)
-        self.path_solved = True
-        if (verbose):
-            self.create_plot()
+        if self.start != [] or self.end != []:
+            start = self.start[:2]
+            self.path_solved, self.path, self.checkpoints, self.visited = run_Astar(self.grid, start, self.end,
+                                                                                    self.width, self.height)
+            if verbose:
+                self.create_plot()
+        else:
+            print("No start or end to launch A_star")
 
     def draw_arrow(self):
         """
@@ -60,13 +64,13 @@ class Map:
         ax.grid(True)
         # Start and end definition
         self.draw_arrow()
-        ax.scatter(self.start[0], self.start[1], marker="o", color='green', s=200);
-        ax.scatter(self.end[0], self.end[1], marker="o", color='purple', s=200);
+        ax.scatter(self.start[0], self.start[1], marker="o", color='green', s=200)
+        ax.scatter(self.end[0], self.end[1], marker="o", color='purple', s=200)
         # Plot the best path found and the list of visited nodes
-        if (self.path_solved):
-            ax.scatter(self.visited[0], self.visited[1], marker="o", color='orange');
-            ax.plot(self.path[0], self.path[1], marker="o", color='blue');
-            ax.scatter(self.checkpoints[0], self.checkpoints[1], marker="o", color='cyan', s=80);
+        if self.path_solved:
+            ax.scatter(self.visited[0], self.visited[1], marker="o", color='orange')
+            ax.plot(self.path[0], self.path[1], marker="o", color='blue')
+            ax.scatter(self.checkpoints[0], self.checkpoints[1], marker="o", color='cyan', s=80)
         # Plot the Obstacles
         cmap = colors.ListedColormap(
             ['white', 'red'])  # Select the colors with which to display obstacles and free cells
@@ -74,6 +78,7 @@ class Map:
         ax.invert_yaxis()
         ax.xaxis.tick_top()
         plt.show()
+
 
 def _get_movements_8n():
     """
@@ -112,11 +117,14 @@ def reconstruct_path(cameFrom, current):
 def A_Star(start, goal, h, coords, occupancy_grid, width, height, movement_type="8N"):
     """
     A* for 2D occupancy grid. Finds a path from start to goal.
-    h is the heuristic function. h(n) estimates the cost to reach goal from node n.
     :param start: start node (x, y)
-    :param goal_m: goal node (x, y)
+    :param goal: goal node (x, y)
+    :param h: estimates the cost to reach goal from node n.
+    :param coords: matrix of the size of the Map
+    :param width: width of the Map
+    :param height: height of the Map
     :param occupancy_grid: the grid map
-    :param movement: select between 4-connectivity ('4N') and 8-connectivity ('8N', default)
+    :param movement_type: select between 4-connectivity ('4N') and 8-connectivity ('8N', default)
     :return: a tuple that contains: (the resulting path in meters, the resulting path in data array indices)
     """
 
@@ -124,19 +132,19 @@ def A_Star(start, goal, h, coords, occupancy_grid, width, height, movement_type=
     # DO NOT EDIT THIS PORTION OF CODE
     # -----------------------------------------
 
-    assert start[0] >= 0 and start[1] >= 0 and start[0] < width and start[1] < height, "start not contained in the map"
-    assert goal[0] >= 0 and goal[1] >= 0 and goal[0] < width and goal[1] < height, "end goal not contained in the map"
+    assert 0 <= start[0] < width and 0 <= start[1] < height, "start not contained in the map"
+    assert 0 <= goal[0] < width and 0 <= goal[1] < height, "end goal not contained in the map"
     # check if start and goal nodes correspond to free spaces
     if occupancy_grid[start[0], start[1]]:
-        raise Exception('Start node is not traversable')
+        print("Start node is not traversable")
+        return [], []
 
     if occupancy_grid[goal[0], goal[1]]:
-        raise Exception('Goal node is not traversable')
+        print("Goal node is not traversable")
+        return [], []
 
     # get the possible movements corresponding to the selected connectivity
-    if movement_type == '4N':
-        movements = _get_movements_4n()
-    elif movement_type == '8N':
+    if movement_type == '8N':
         movements = _get_movements_8n()
     else:
         raise ValueError('Unknown movement')
@@ -218,9 +226,9 @@ def checkpoints_path(path):
     checkpoints = np.reshape(path[:, 0], (2, -1))
     for i in range(steps):
         nb_i = np.reshape(path[:, i], (2, -1))
-        if (i == (steps - 1)):
+        if i == (steps - 1):
             checkpoints = np.append(checkpoints, nb_i, axis=1)
-        elif (i != 0):
+        elif i != 0:
             if (((path[0, (i + 1)] - path[0, i]) != (path[0, i] - path[0, (i - 1)])) or (
                     (path[1, (i + 1)] - path[1, i]) != (path[1, i] - path[1, (i - 1)]))):
                 checkpoints = np.append(checkpoints, nb_i, axis=1)
@@ -234,7 +242,7 @@ def run_Astar(occupancy_grid, start, goal, width, height):
     # List of all coordinates in the grid
     x, y = np.mgrid[0:width:1, 0:height:1]
     pos = np.empty(x.shape + (2,))
-    pos[:, :, 0] = x;
+    pos[:, :, 0] = x
     pos[:, :, 1] = y
     pos = np.reshape(pos, (x.shape[0] * x.shape[1], 2))
     coords = list([(int(x[0]), int(x[1])) for x in pos])
@@ -246,53 +254,63 @@ def run_Astar(occupancy_grid, start, goal, width, height):
 
     # Run the A* algorithm
     path, visitedNodes = A_Star(start, goal, h, coords, occupancy_grid, width, height, movement_type="8N")
-    path = np.array(path).reshape(-1, 2).transpose()
-    visitedNodes = np.array(visitedNodes).reshape(-1, 2).transpose()
-    checkpoints = checkpoints_path(path)
-    return path, checkpoints, visitedNodes
+    if path != []:
+        path = np.array(path).reshape(-1, 2).transpose()
+        visitedNodes = np.array(visitedNodes).reshape(-1, 2).transpose()
+        checkpoints = checkpoints_path(path)
+        verbose = True
+        return verbose, path, checkpoints, visitedNodes
+    else:
+        verbose = False
+        return verbose, [], [], []
 
-def box_range(coord,coord_size,Margin):
-    coord_low = np.arange((coord-Margin), coord)
-    coord_high = np.arange(coord,(coord+Margin+1))
-    coord_tot = np.concatenate((coord_low,coord_high),0)
+
+def box_range(coord, coord_size, Margin):
+    """
+    Find the smallest box around the obstacle including the Margin.
+    """
+    coord_low = np.arange((coord - Margin), coord)
+    coord_high = np.arange(coord, (coord + Margin + 1))
+    coord_tot = np.concatenate((coord_low, coord_high), 0)
     coord_tot = coord_tot[coord_tot >= 0]
     coord_tot = coord_tot[coord_tot < coord_size]
     return coord_tot
 
-def Obstacles_real(size_thymio,size_pixel,grid,width,height):
-    Margin_px = size_thymio/size_pixel
+
+def Obstacles_real(size_thymio, size_pixel, grid, width, height):
+    """
+    Augment the size of each obstacle, to palliate the problem of point size robot
+    """
+    Margin_px = size_thymio / size_pixel
     temp_grid = grid.copy()
     Obs_coords = np.nonzero(grid > 0.5)
-    steps = np.size(Obs_coords,1)
-    for i in range (steps):
+    steps = np.size(Obs_coords, 1)
+    for i in range(steps):
         x_i = Obs_coords[0][i]
         y_i = Obs_coords[1][i]
-        range_x = box_range(x_i,width,Margin_px)
-        range_y = box_range(y_i,height,Margin_px)
+        range_x = box_range(x_i, width, Margin_px)
+        range_y = box_range(y_i, height, Margin_px)
         for j in range_x:
             for k in range_y:
-                if (np.linalg.norm((x_i-j,y_i-k)) < Margin_px ):
-                    temp_grid[int(j),int(k)] = 1
+                if np.linalg.norm((x_i - j, y_i - k)) < Margin_px:
+                    temp_grid[int(j), int(k)] = 1
     return temp_grid
 
-
-
-
 # # Size of Map and start,end
-#width = 60
-#height = 50
+# width = 60
+# height = 50
 # start = (0,0)
 # end = (49,49)
-#size_thymio = 1.42
-#size_pixel = 1
+# size_thymio = 1.42
+# size_pixel = 1
 # # random obstacles
 # np.random.seed(0) # To guarantee the same outcome on all computers
-#data = np.random.rand(width, height) * 100 # Create a grid of width x height random values
+# data = np.random.rand(width, height) * 100 # Create a grid of width x height random values
 # # Converting the random values into occupied and free cells
-#limit = 95
-#occupancy_grid = data.copy()
-#occupancy_grid[data>limit] = 1
-#occupancy_grid[data<=limit] = 0
-#grid2 = Obstacles_real(size_thymio,size_pixel,occupancy_grid,width,height)
+# limit = 95
+# occupancy_grid = data.copy()
+# occupancy_grid[data>limit] = 1
+# occupancy_grid[data<=limit] = 0
+# grid2 = Obstacles_real(size_thymio,size_pixel,occupancy_grid,width,height)
 # m = Map(width,height,start,end,grid2)
 # m.run_map(True)
