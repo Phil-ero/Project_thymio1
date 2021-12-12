@@ -57,7 +57,7 @@ def kalman_filter(speed, cam_available, cam_data, x_est_prev, P_est_prev, Q, R, 
     # Transform vl and vr to metric [mm/s]
     vl = 0.43478260869565216 * vl
     vr = 0.43478260869565216 * vr
-    theta_est = x_est_prev[2]  # changement car pas initialisé je met x_est_prev à la place de x_est
+    theta_est = x_est_prev[2]  
 
     # Prediction through the a priori estimate
 
