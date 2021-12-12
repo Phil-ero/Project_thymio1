@@ -6,7 +6,7 @@ from matplotlib import colors
 
 
 class Map:
-    def __init__(self, width, height, start, end, grid, ratio_total):
+    def __init__(self, width, height, start, end, grid, ratio_total, ratio_downscale):
         self.width = width
         self.height = height
         self.start = start
@@ -16,6 +16,7 @@ class Map:
         self.checkpoints = np.empty(0)
         self.visited = np.empty(0)
         self.ratio_total = ratio_total
+        self.ratio_downscale = ratio_downscale
         self.path_solved = False
 
     def run_map(self, verbose=False):
