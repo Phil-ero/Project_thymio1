@@ -477,7 +477,7 @@ def analyse(img):
     # Find the outer boundary
     contours, area_max = FindOuterContour(img, areaMin=280, ShowCanny=False)
     # if outer boundary found
-    if (contours[0]) > 0:
+    if len(contours)>0 :
         # resize the image with outer contours
         croppedImg, width, height = CropImage(img, contours)
         cv2.imshow('cropped', croppedImg)
@@ -549,7 +549,7 @@ def analyse_thymio(img,contours, area_max):
     # Find the outer boundary
     # contours, area_max = FindOuterContour(img, areaMin=280, ShowCanny=False, ShowImg= False)
     # if outer boundary found
-    if (contours[0]) > 0:
+    if len(contours)>0 : #contours ! = []:
         # resize the image with outer contours
         croppedImg, _, _ = CropImage(img, contours)
         # cv2.imshow('cropped', croppedImg)
