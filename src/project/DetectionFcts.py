@@ -563,7 +563,7 @@ def analyse_thymio(img, contours, area_max, ratio_downscale):
         # resize the image with outer contours
         croppedImg, _, _ = CropImage(img, contours)
         Thymio_pos = thymio_detect(croppedImg, area_max)
-        if Thymio_pos != []:
+        if Thymio_pos != ((0, 0), 0):
             Thymio_xy = Thymio_pos[0]
             Thymio_coord = (Thymio_xy[0], Thymio_xy[1], Thymio_pos[1])
             Thymio_real_x = int(round(ratio_downscale * Thymio_coord[0]))
