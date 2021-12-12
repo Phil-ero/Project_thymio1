@@ -334,21 +334,4 @@ def Obstacles_real(size_thymio, size_pixel, grid, width, height):
                     temp_grid[int(j), int(k)] = 1
     return temp_grid
 
-# # Size of Map and start,end
-# width = 60
-# height = 50
-# start = (0,0)
-# end = (49,49)
-# size_thymio = 1.42
-# size_pixel = 1
-# # random obstacles
-# np.random.seed(0) # To guarantee the same outcome on all computers
-# data = np.random.rand(width, height) * 100 # Create a grid of width x height random values
-# # Converting the random values into occupied and free cells
-# limit = 95
-# occupancy_grid = data.copy()
-# occupancy_grid[data>limit] = 1
-# occupancy_grid[data<=limit] = 0
-# grid2 = Obstacles_real(size_thymio,size_pixel,occupancy_grid,width,height)
-# m = Map(width,height,start,end,grid2)
-# m.run_map(True)
+
