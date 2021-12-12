@@ -7,4 +7,5 @@ We have realized this project in the framework of the course Basics of mobile ro
 -	Global and Local navigation: Find the shortest path to the goal, and avoids obstacles placed randomly while moving towards the goal 
 -	Filtering: diverse filters in Computer vision and Kalman filter in Motion control
  We will combine these elements into a global project that will allow us to maneuver the Thymio robot in a defined map around obstacles. For more details, we will discuss the challenges linked to each part in the following sub-sections.
-Link to video :https://github.com/Phil-ero/Project_thymio1/blob/main/ThymioFast.mp4
+## Video of the project
+![ThymioFast](ThymioFast.gif)
