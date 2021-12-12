@@ -514,7 +514,7 @@ def analyse(img, show_img=False):
         real_width = 554  # Map size in mm
         real_height = 380  # Map size in mm
         ratio_camera = (real_width / width + real_height / height) / 2  # Ratio [mm/px]
-        real_thymio = 100  # 1/2 Thymio size = 60mm
+        real_thymio = 75  # 1/2 Thymio size = 60mm
         ratio_total = ratio_camera / ratio_downscale  # mm/px in A_star
 
         # Parameters for A_star
