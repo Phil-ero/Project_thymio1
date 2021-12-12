@@ -110,9 +110,6 @@ def kalman_filter(speed, cam_available, cam_data, x_est_prev, P_est_prev, Q, R, 
             x_est = cam_data
             print("Didn't use Kalman \n")
 
-        # x_est[1] = cam_data[1]
-        # x_est[2] = cam_data[2]
-
     else:
         # no measurement so we just use x a posteriori(k+1) to be equal to the a priori(k+1)
         # since no measurement to correct
@@ -164,9 +161,7 @@ def control_law(sensor_data, checkpoints_data, current_checkpoint_index, fsm_sta
     # Parameters related to estimated postion and current checkpoint
 
     [total_rows, total_columns] = checkpoints_data.shape  # we want to know the amount of checkpoints we have, that is give by the amount of rows
-    #first_checkpoint_bool = (current_checkpoint_index == 0)  # boolean to check whether our current goal is the last checkpoint
     last_checkpoint_bool = (current_checkpoint_index == (total_rows - 1))  # boolean to check whether our current goal is the last checkpoint
-    # print('Checkpoint number : '+str(current_checkpoint_index) + '\n')
 
     current_checkpoint = checkpoints_data[current_checkpoint_index]  # position of the checkpoint we aim for
     current_checkpoint_x = current_checkpoint[0]  # position x of the checkpoint we aim for
@@ -187,11 +182,6 @@ def control_law(sensor_data, checkpoints_data, current_checkpoint_index, fsm_sta
     delta_angle = angle_deg - est_orientation_deg  # [deg]
     euler_distance = math.sqrt(delta_x ** 2 + delta_y ** 2)
 
-    #print ('Checkpoint x :' + str(current_checkpoint[0]) + ', Checkpoint y :' + str(current_checkpoint[1]) +'\n')
-    #print ('Position x :' + str(est_pos_x) + ', Position y :' + str(est_pos_y) +'\n')
-    print ('Estimated orientation : ' + str(est_orientation_deg) + '\n')
-    print ('Angle wanted : ' + str(angle_deg) + '\n')
-
     reached_end = False
 
     # Beginning of Finite State Machine
@@ -204,14 +194,11 @@ def control_law(sensor_data, checkpoints_data, current_checkpoint_index, fsm_sta
             new_fsm_state = "rotating"
             new_checkpoint_index = current_checkpoint_index + 1
         else:
-            # new_fsm_state = "rotating"
-            # new_checkpoint_index = current_checkpoint_index + 1
             new_fsm_state = "starting"
             new_checkpoint_index = current_checkpoint_index
 
         left_velocity = 0
         right_velocity = 0
-        # new_fsm_state = "rotating"  # ! line to be removed once camera is integrated
 
         return left_velocity, right_velocity, new_fsm_state, new_checkpoint_index, reached_end
 
@@ -253,23 +240,14 @@ def control_law(sensor_data, checkpoints_data, current_checkpoint_index, fsm_sta
             right_velocity = base_translational_velocity
             new_fsm_state = "moving"
             new_checkpoint_index = current_checkpoint_index
-            # print('Distance to checkpoint : '+str(euler_distance) + '\n')
 
             return left_velocity, right_velocity, new_fsm_state, new_checkpoint_index, reached_end
 
     elif fsm_state == "rotating":
 
-        # print('Current orientation estimate : '+str(est_orientation_deg) + ' [degrees]\n')
-        # print('delta_angle : '+str(delta_angle) + ' [degrees]\n')
-
         if delta_angle > angle_threshold_low:
             left_velocity = -base_rotational_velocity
             right_velocity = base_rotational_velocity
-
-            # # higher speed if we are far away
-            # if delta_angle > angle_threshold_high:
-            #     left_velocity = -base_translational_velocity
-            #     right_velocity = base_translational_velocity
 
             new_fsm_state = "rotating"
             new_checkpoint_index = current_checkpoint_index
@@ -282,11 +260,6 @@ def control_law(sensor_data, checkpoints_data, current_checkpoint_index, fsm_sta
         elif delta_angle < -angle_threshold_low:
             left_velocity = base_rotational_velocity
             right_velocity = -base_rotational_velocity
-
-            # # higher speed if we are far away
-            # if delta_angle < -angle_threshold_high:
-            #     left_velocity = base_translational_velocity
-            #     right_velocity = -base_translational_velocity
 
             new_fsm_state = "rotating"
             new_checkpoint_index = current_checkpoint_index
