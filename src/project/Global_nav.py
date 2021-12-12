@@ -270,7 +270,7 @@ def run_Astar(occupancy_grid, start, goal, width, height):
     pos[:, :, 1] = y
     pos = np.reshape(pos, (x.shape[0] * x.shape[1], 2))
     coords = list([(int(x[0]), int(x[1])) for x in pos])
-    # print(coords)
+  
 
     # Define the heuristic, here = distance to goal ignoring obstacles
     h = np.linalg.norm(pos - goal, axis=-1)
