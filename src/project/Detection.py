@@ -88,6 +88,6 @@ while True:
                         x = xMap[i]
                         y = yMap[i]
                         cv2.circle(croppedImg, (x, y), 3, (0, 255, 255), -1)
-                    # cv2.imshow('path', croppedImg)
+                   
         else:
             print("did not find outer contours")

@@ -57,7 +57,7 @@ def kalman_filter(speed, cam_available, cam_data, x_est_prev, P_est_prev, Q, R, 
     # Transform vl and vr to metric [mm/s]
     vl = 0.43478260869565216 * vl
     vr = 0.43478260869565216 * vr
-    theta_est = x_est_prev[2]  # changement car pas initialisé je met x_est_prev à la place de x_est
+    theta_est = x_est_prev[2]  
 
     # Prediction through the a priori estimate
 
@@ -102,13 +102,13 @@ def kalman_filter(speed, cam_available, cam_data, x_est_prev, P_est_prev, Q, R, 
         # Protections against bad kalman estimation that cause huge jumps
         if abs(x_est[0] - x_est_a_priori[0]) < 50 :
             x_est = cam_data
-            print("Didn't use Kalman \n")
+            #print("Didn't use Kalman \n")
         elif abs(x_est[1] - x_est_a_priori[1]) < 50 : 
             x_est = cam_data
-            print("Didn't use Kalman \n")
+            #print("Didn't use Kalman \n")
         elif abs(x_est[2] - x_est_a_priori[2]) < 20 :
             x_est = cam_data
-            print("Didn't use Kalman \n")
+            #print("Didn't use Kalman \n")
 
     else:
         # no measurement so we just use x a posteriori(k+1) to be equal to the a priori(k+1)

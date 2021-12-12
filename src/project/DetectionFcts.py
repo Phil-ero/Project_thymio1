@@ -5,8 +5,6 @@ import Global_nav as GN
 from Global_nav import Map
 
 
-# import matplotlib.pyplot as plt
-# from matplotlib import colors
 
 
 # -----------FindOuterContour-----------------------------------------------------------
@@ -57,11 +55,7 @@ def FindOuterContour(img, areaMin, ShowCanny=False, ShowImg=False):
             cv2.circle(img, (x, y), 3, (255, 0, 255), -1)
     if ShowImg:
         cv2.imshow('original2', img)
-    # Plotting the original photo with map borders detected
-    # plt.figure(figsize=(7, 7))
-    # rgb_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    # plt.imshow(rgb_img)
-    # plt.show()
+
     return maxContour, area_max
 
 
